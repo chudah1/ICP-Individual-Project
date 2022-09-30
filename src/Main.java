@@ -3,8 +3,18 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Main {
-    private static HashMap<String, ArrayList<Data>> route;
+    private static HashMap<String, ArrayList<Route>> route;
     private static HashMap<String, ArrayList<String>> airports;
+
+    static {
+        try {
+            route = Route.routes();
+            airports = Airport.readAirports();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static ArrayList<String> airportsInDest = new ArrayList<>();
     private static ArrayList<String> airportsInStart = new ArrayList<>();
     private static String startAirport;
@@ -16,8 +26,7 @@ public class Main {
      * @param state the current state of the problem
      * @return The successor states of the current state.
      */
-    public static ArrayList<Data> getSuccessorStates(String state) throws FileNotFoundException {
-        route = Route.routes();
+    public static ArrayList<Route> getSuccessorStates(String state){
         return route.get(state);
     }
 
@@ -27,8 +36,7 @@ public class Main {
      * @param state the state that the user is currently in
      * @return A boolean value.
      */
-    public static boolean foundDestination(String state) throws FileNotFoundException {
-        airports = Airport.readAirports();
+    public static boolean foundDestination(String state){
         airportsInDest = airports.get(destinationAirport);
         return airportsInDest.contains(state);
     }
@@ -38,43 +46,41 @@ public class Main {
      * The function takes in a state and returns true if there is a path from the state to the destination, and false
      * otherwise
      *
-     * @param state the current state of the agent
+     * @param startCountryCity the current state of the agent
      * @return The method returns a boolean value.
      */
-    public static boolean bfs(String state) throws FileNotFoundException {
-        route = Route.routes();
-        Node start = new Node(state);
+
+    /*
+    public static void bfs(String startCountryCity) {
+        ArrayList<String> availableAirports = airports.get(startCountryCity);
         Queue<Node> frontier = new LinkedList<>();
         HashSet<String> visited = new HashSet<>();
-        if (foundDestination(start.getState())) {
-            start.solutionPath();
-            return true;
+        for (String state : availableAirports) {
+            Node start = new Node(state);
+            frontier.add(start);
+            if (foundDestination(state)) start.solutionPath();
         }
-        frontier.add(start);
+
         while (!frontier.isEmpty()) {
             Node currentAirport = frontier.remove();
-            if (!route.containsKey(currentAirport.getState())) continue;
             visited.add(currentAirport.getState());
-            ArrayList<Data> succStates = getSuccessorStates(currentAirport.getState());
-            for (Data succState : succStates) {
+            if (!route.containsKey(currentAirport.getState())) continue;
+            ArrayList<Route> succStates = getSuccessorStates(currentAirport.getState());
+            for (Route succState : succStates) {
                 String destinationAirportCode = succState.getDestAirportCode();
                 String airlineCode = succState.getAirlineCode();
                 int nStops = succState.getStops();
-                double harvesine = 0;
-                //double haversineDistance = succStates.get(i).getDistanceBetweenDestination();
-                Node child = new Node(destinationAirportCode, airlineCode, nStops, currentAirport, harvesine);
+                Node child = new Node(destinationAirportCode, airlineCode, nStops + currentAirport.nStops, currentAirport);
                 if (!visited.contains(child.getState()) && !frontier.contains(child)) {
-                    if (foundDestination(child.getState())) {
-                        child.solutionPath();
-                        return true;
-                    }
+                    if (foundDestination(child.getState())) child.solutionPath();
+                    frontier.add(child);
                 }
-                frontier.add(child);
             }
         }
-        return false;
     }
 
+     */
+/**
     public static boolean ucs(String state) throws FileNotFoundException {
         Node start = new Node(state);
         Comparator<Node> comparator = new NodeDistanceComparator();
@@ -118,33 +124,27 @@ public class Main {
         }
         return false;
     }
-
-
-    public static void main(String[] args) throws FileNotFoundException {
-        airports = Airport.readAirports();
-        try {
-            File file = new File("src/accra-london.txt");
-            Scanner scan = new Scanner(file);
-            startAirport = scan.nextLine();
-            destinationAirport = scan.nextLine();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            airportsInStart = airports.get(startAirport);
-            airportsInDest = airports.get(destinationAirport);
-        } catch (Exception e) {
-            System.out.println(e.getStackTrace());
-        }
-
-
-        for (String airport : airportsInStart) {
-            if (bfs(airport)) break;
-        }
-
-
+**/
+public static void main(String[] args) {
+    try {
+        File file = new File("src/accra-london.txt");
+        Scanner scan = new Scanner(file);
+        startAirport = scan.nextLine();
+        destinationAirport = scan.nextLine();
+    } catch (FileNotFoundException e) {
+        throw new RuntimeException(e);
     }
+
+    try {
+        airportsInStart = airports.get(startAirport);
+        airportsInDest = airports.get(destinationAirport);
+    } catch (Exception e) {
+        System.out.println(e.getStackTrace());
+    }
+
+    bfs(startAirport);
+}
+
 
 
 }

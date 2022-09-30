@@ -9,7 +9,7 @@ public class Data {
     private int stops;
     private double distanceBetweenDestination;
 
-    public Data(String airlineCode,String destAirportCode,  int stops, double distanceBetweenDestination) {
+    public Data(String airlineCode, String destAirportCode,  int stops) {
         this.destAirportCode = destAirportCode;
         this.airlineCode = airlineCode;
         this.stops = stops;

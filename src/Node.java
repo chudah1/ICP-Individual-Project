@@ -10,13 +10,11 @@ public class Node {
     int nStops;
     private double HarvesineDistance;
 
-    public Node(String state, String airlineCode, int nStops, Node parent, double HarvesineDistance) {
+    public Node(String state, String airlineCode, int nStops, Node parent) {
         this.state = state;
         this.parent = parent;
         this.airlineCode = airlineCode;
         this.nStops = nStops;
-        this.HarvesineDistance = HarvesineDistance;
-
     }
 
     public Node(String state) {
@@ -45,11 +43,8 @@ public class Node {
     // This function is used to check if the current node is equal to the node passed as a parameter.
     public boolean equals(Object obj) {
         if (obj == this) return true;
-
         if (!(obj instanceof Node)) return false;
-
         Node node = (Node) obj;
-
         return this.state.equals(node.state);
 
     }
@@ -69,16 +64,13 @@ public class Node {
         Collections.reverse(solution);
 
         try {
-            FileWriter myWriter = new FileWriter("accra-london_output.txt");
+            FileWriter myWriter = new FileWriter("src/accra-london_output.txt");
             PrintWriter printWriter = new PrintWriter(myWriter);
-            // Used to count the number of stops in the solution path.
-            int noStops = 0;
             for (String solutionpath : solution) {
                 printWriter.println(solutionpath);
-                noStops += Integer.parseInt(solutionpath.split(" ")[5]);
             }
             printWriter.println("Total flights: " + "" + solution.size());
-            printWriter.println("Total additional stops: " + "" + noStops);
+            printWriter.println("Total additional stops: " + "" + nStops);
             printWriter.close();
 
         } catch (IOException e) {
